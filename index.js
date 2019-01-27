@@ -42,7 +42,7 @@ app.post('/register', function (request, response) {
                 error:'user not created'
             });
         }else{
-            respond.send(user);
+            response.send(user);
         }
     });
 

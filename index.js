@@ -30,7 +30,28 @@ app.post('/login', function(request, response){
     response.send(request.body);
 })
 app.post('/register', function (request, response) {
-    console.log(request.body);
+   // console.log(request.body);
+   if(request.body.username && request.body.password){
+    User.create({
+        username:request.body.username,
+        password:request.body.password
+    }, function(error, user){
+        if(error){
+            response.render('error',{
+                title:'error',
+                error:'user not created'
+            });
+        }else{
+            respond.send(user);
+        }
+    });
+
+   }else{
+       response.render('error',{
+        title:'error',
+        error:'username and password required'
+    });
+   }
 });
 app.get('/register', function (request, response) {
     response.render('register', { title: 'Register' });

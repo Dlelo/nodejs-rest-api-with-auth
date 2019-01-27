@@ -2,19 +2,25 @@ var express = require('express');
 var mongoose = require('mongoose');
 var pug = require('pug');
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt');
+
+//models
+var User = require('./models/User');
 
 //app
 var app = express();
 
+var db = mongoose.connect('mongodb://localhost:27017/noderest');
+
 //setup
 app.set('view engine', 'pug');
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended:true }));
+app.use(bodyParser.urlencoded({ useNewUrlParser:true }));
 app.use(bodyParser.json());
 
 //routes
 app.get('/', function(request, response){
-    response.render('index', {title:'Welcome to getit'});
+    response.render('index', {title:'Welcome'});
 });
 
 app.get('/login', function(request, response){
@@ -23,6 +29,9 @@ app.get('/login', function(request, response){
 app.post('/login', function(request, response){
     response.send(request.body);
 })
+app.post('/register', function (request, response) {
+    console.log(request.body);
+});
 app.get('/register', function (request, response) {
     response.render('register', { title: 'Register' });
 });

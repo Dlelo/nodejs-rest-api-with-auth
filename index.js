@@ -18,17 +18,36 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ useNewUrlParser:true }));
 app.use(bodyParser.json());
 
+//functon to ensure user is authenticated
+var authenticated = function (request, response, next) {
+    if(request.session.user) return next();
+
+    return response.redirect('/login');
+}
 //routes
 app.get('/', function(request, response){
     response.render('index', {title:'Welcome'});
+});
+app.get('/me', authenticated, function(request, response){
+  response.send(request.session.user); 
 });
 
 app.get('/login', function(request, response){
     response.render('login',{title:'Login'});    
 });
 app.post('/login', function(request, response){
-    response.send(request.body);
-})
+    User.findOne({username:request.body.username}, function(err,user){
+       if(err) return response.render('error',{error: err, title:'error'});
+        if(!user) return response.render('error', { error: 'user does not exixt'});
+       
+       if(user.compare(request.body.password)) {
+         request.session.user = user
+
+         response.redirect('/me');
+       }
+    });
+    //response.send(request.body);
+});
 app.post('/register', function (request, response) {
    // console.log(request.body);
    if(request.body.username && request.body.password){
@@ -52,6 +71,14 @@ app.post('/register', function (request, response) {
         error:'username and password required'
     });
    }
+});
+
+app.get('/users.json', function(request, response){
+    User.find({}, function(err, users){
+        if (err) throw err;
+
+        response.send(users);
+    });
 });
 app.get('/register', function (request, response) {
     response.render('register', { title: 'Register' });

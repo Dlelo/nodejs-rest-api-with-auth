@@ -3,6 +3,8 @@ var mongoose = require('mongoose');
 var pug = require('pug');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
 
 //models
 var User = require('./models/User');
@@ -17,31 +19,39 @@ app.set('view engine', 'pug');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ useNewUrlParser:true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(session({secret: 'sfhjfhghghchgchggc', saveUninitialized: true, resave:true}));
 
-//functon to ensure user is authenticated
+//functon to ensure user is authenticated - express middleware
 var authenticated = function (request, response, next) {
-    if(request.session.user) return next();
-
+    if(request.session) return next(); 
+      
     return response.redirect('/login');
 }
 //routes
+app.get('/me', authenticated, function (request, response) {
+    response.send(request.session.user);
+});
+
 app.get('/', function(request, response){
     response.render('index', {title:'Welcome'});
 });
-app.get('/me', authenticated, function(request, response){
-  response.send(request.session.user); 
-});
+
 
 app.get('/login', function(request, response){
     response.render('login',{title:'Login'});    
 });
+
 app.post('/login', function(request, response){
     User.findOne({username:request.body.username}, function(err,user){
        if(err) return response.render('error',{error: err, title:'error'});
         if(!user) return response.render('error', { error: 'user does not exixt'});
        
        if(user.compare(request.body.password)) {
-         request.session.user = user
+         request.session.user = user;
+         request.session.save();
+
+         console.log('logged in: '+ user.username)
 
          response.redirect('/me');
        }

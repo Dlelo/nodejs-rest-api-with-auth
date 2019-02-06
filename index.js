@@ -24,7 +24,7 @@ app.use(session({secret: 'sfhjfhghghchgchggc', saveUninitialized: true, resave:t
 
 //functon to ensure user is authenticated - express middleware
 var authenticated = function (request, response, next) {
-    if(request.session) return next(); 
+    if(request.session && request.session.user) return next(); 
       
     return response.redirect('/login');
 }
@@ -45,7 +45,7 @@ app.get('/login', function(request, response){
 app.post('/login', function(request, response){
     User.findOne({username:request.body.username}, function(err,user){
        if(err) return response.render('error',{error: err, title:'error'});
-        if(!user) return response.render('error', { error: 'user does not exixt'});
+        if(!user) return response.render('error', { error: 'user does not exist'});
        
        if(user.compare(request.body.password)) {
          request.session.user = user;
@@ -54,7 +54,8 @@ app.post('/login', function(request, response){
          console.log('logged in: '+ user.username)
 
          response.redirect('/me');
-       }
+       }else
+        return response.render('error', {error:'incorrect credentials', title:'error'})
     });
     //response.send(request.body);
 });

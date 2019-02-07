@@ -1,7 +1,9 @@
 extends layout
 
-block content 
-  a(href="/login") Login
-  p |
-  a(href="/register") Register
+block content  
+  a(href='/publication')
+    p  New publications
+  ul
+    each publication in publications
+      li= publication
   

@@ -8,6 +8,7 @@ var session = require('express-session');
 
 //models
 var User = require('./models/User');
+var Publication = require('./models/Publication');
 
 //app
 var app = express();
@@ -30,11 +31,18 @@ var authenticated = function (request, response, next) {
 }
 //routes
 app.get('/me', authenticated, function (request, response) {
-    response.send(request.session.user);
+    response.render('me', {username: request.session.user.username});
 });
 
 app.get('/', function(request, response){
-    response.render('index', {title:'Welcome'});
+    if(request.session && request.session.user){
+      Publication.find({}, function(err, publications){
+          response.render('index', {title: 'Home', publications:publications})
+      });
+    } else{
+      response.render('welcome', { title: 'Welcome' });
+    }
+    
 });
 
 

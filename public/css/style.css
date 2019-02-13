@@ -4,3 +4,8 @@ body{
 h1{
     color:purple;
 }
+li{
+    list-style: none;
+    line-height: 30px;
+
+}

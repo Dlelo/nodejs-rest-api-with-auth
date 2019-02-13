@@ -33,14 +33,48 @@ var authenticated = function (request, response, next) {
 app.get('/me', authenticated, function (request, response) {
     response.render('me', {username: request.session.user.username});
 });
+app.get('/publication',authenticated, function(request, response){
+    response.render('publication',{title:'Publish something!'})
+});
+app.post('/publication',authenticated, function(request, response){
+  //response.send(request.body.publication);
+  if(!request.body || !request.body.publication){
+      return response.render('error', { error: 'no publication found', title: 'Error' })
+  } 
+  //if a publication exists
+  Publication.create({
+      publication: request.body.publication,
+      author: request.session.user._id
+  }, function(err, publication){
+     if(err) return response.render('error', {error: 'error creating publication', title:'error'});
+
+     console.log('Publication created successfully!')
+     response.redirect('/status/' + publication._id);
+  });
+
+});
+app.get('/status/:id', function(request, response){
+ Publication.findOne({_id: request.params.id}, function(err, publication){
+    User.findOne({_id:publication.author}, function(e, user){
+        response.render('status', { username: user.username, content: publication.publication });
+    });
+    
+ });
+});
+
+
 
 app.get('/', function(request, response){
-    if(request.session && request.session.user){
-      Publication.find({}, function(err, publications){
+    if (request.session && request.session.user){
+      Publication.find({}, null, {sort:{created_at:-1}}, function(err, publications){
           response.render('index', {title: 'Home', publications:publications})
       });
-    } else{
-      response.render('welcome', { title: 'Welcome' });
+    }else{
+        response.render('welcome', {title: 'Welcome'});
+      //Publication.find({}, function (err, publications){
+          //response.render('welcome', { title: 'Welcome', publications: publications });
+      //});
+        
     }
     
 });
@@ -81,6 +115,7 @@ app.post('/register', function (request, response) {
             });
         }else{
             response.send(user);
+            
         }
     });
 
@@ -90,6 +125,12 @@ app.post('/register', function (request, response) {
         error:'username and password required'
     });
    }
+});
+app.get('/user/@:username', function(request, response){
+  User.findOne({username: request.params.username}, function(err, user){
+    
+    response.render('user', {user:user, title:user.username});
+  });
 });
 
 app.get('/users.json', function(request, response){

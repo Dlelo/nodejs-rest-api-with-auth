@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  form(action="/publication", method="POST")
+    textarea(name="publication" placeholder="Publish something!")
+    br
+    input(type="submit")

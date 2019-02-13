@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var publicationSchema = new Schema({
     publication: { type: String, required: true },
     created_at: Date,
-    author: Schema.Types.ObjectId
+    author:{ type: Schema.Types.ObjectId, required: true}
 
 });
 //this is in the middle of the process of saving the user to the database

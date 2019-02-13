@@ -2,8 +2,11 @@ extends layout
 
 block content  
   a(href='/publication')
-    p  New publications
+    h2  New publications
   ul
     each publication in publications
-      li= publication
+      //Native javascript on pug
+      -var content = publication.publication
+      -var author = publication.author
+      li #{content} - #{author}
   

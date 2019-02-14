@@ -8,5 +8,8 @@ block content
       //Native javascript on pug
       -var content = publication.publication
       -var author = publication.author
-      li #{content} - #{author}
+      -var path = "/status/" + publication._id
+      a(href=path) 
+       li #{content}
+        
   

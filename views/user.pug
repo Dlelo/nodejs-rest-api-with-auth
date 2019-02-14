@@ -1,5 +1,12 @@
 extends layout
 
 block content
-  h2 User Page
+  -var username = user.username
+  h2 @ #{username}
+  div
+    ul
+    each publication in publications
+      //Native javascript on pug
+      -var content = publication.publication
+      li #{content} 
   

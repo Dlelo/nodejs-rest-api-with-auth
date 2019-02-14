@@ -93,11 +93,12 @@ app.post('/login', function(request, response){
          request.session.user = user;
          request.session.save();
 
-         console.log('logged in: '+ user.username)
+         console.log('logged in: '+ user.username);
 
-         response.redirect('/me');
-       }else
-        return response.render('error', {error:'incorrect credentials', title:'error'})
+         return response.redirect('/');
+       }else{
+           return response.render('error', { error: 'incorrect credentials', title: 'error' });
+       }    
     });
     //response.send(request.body);
 });
@@ -113,9 +114,8 @@ app.post('/register', function (request, response) {
                 title:'error',
                 error:'user not created'
             });
-        }else{
-            response.send(user);
-            
+        } else {
+            return response.redirect('/');        
         }
     });
 
@@ -128,8 +128,13 @@ app.post('/register', function (request, response) {
 });
 app.get('/user/@:username', function(request, response){
   User.findOne({username: request.params.username}, function(err, user){
-    
-    response.render('user', {user:user, title:user.username});
+    Publication.find({author:user._id}, function(e, publications){
+      response.render('user', {
+        user: user, 
+        title: user.username,
+        publications: publications
+      });
+    });  
   });
 });
 
